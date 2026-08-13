@@ -50,7 +50,7 @@ def show_feedback() -> None:
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
 
 st.title("🎮 Game Glitch Investigator")
-st.caption("A repaired AI-generated guessing game with testable logic.")
+st.caption("A simple number guessing game that finally works.")
 
 st.sidebar.header("Settings")
 difficulty = st.sidebar.selectbox(
@@ -164,4 +164,4 @@ with st.expander("Developer Debug Info"):
     st.write("History:", st.session_state.history)
 
 st.divider()
-st.caption("Built by an AI, repaired with human review and automated tests.")
+st.caption("Started with buggy AI code, then cleaned up and tested.")
