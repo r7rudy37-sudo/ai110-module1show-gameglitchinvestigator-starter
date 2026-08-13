@@ -91,3 +91,6 @@ More details are in [`reflection.md`](reflection.md) and
    style with Ruff.
 4. I made the page easier to follow with score and attempt metrics, clear
    feedback messages, and a history table.
+5. I compared Codex with GitHub Copilot Auto using `gpt-5-mini` on the same hint
+   bug. Copilot gave the shorter explanation, while Codex gave the better fix
+   for the way this project is organized.
