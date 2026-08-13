@@ -1,71 +1,63 @@
 # AI Interactions Log
 
-This log documents the AI-supported stretch work completed with Codex.
+This file covers the extra AI work I did for the stretch features.
 
-## Agent Workflow (Feature Expansion)
+## AI tools and workflow
 
-**Task given to the agent**
+Claude is the main tool taught in this class, so I followed the class workflow
+of giving the AI one focused problem, checking the answer, and testing the result
+before moving on. For the actual project files, I used Codex as a coding agent to
+inspect the repository, edit the files, run the tests, and check the rubric.
 
-> Inspect the official Project 1 rubric and starter repository, reproduce the
-> bugs, repair the game without hiding the original evidence, generate tests,
-> and prepare the required documentation.
+## Agent workflow for the Guess History feature
 
-**What the agent completed**
+### What I asked for
 
-- Inspected the course instructions and the 18-point required-feature rubric.
-- Ran the broken Streamlit app and captured specific incorrect behavior.
-- Updated `logic_utils.py` with pure comparison, parsing, hint, range, and score
-  functions.
-- Updated `app.py` to use the extracted logic, reset all session state, validate
-  inputs, and add a structured Guess History table.
-- Expanded `tests/test_game_logic.py` and completed `README.md`,
-  `reflection.md`, and this interaction log.
-- Created three meaningful local commits: bug evidence, repairs/tests, and final
-  documentation.
+I asked the coding agent to find the bugs in the starter game, move the main
+logic into `logic_utils.py`, add tests, and make the game easier to follow. I
+also asked it to keep a visible history of each valid guess.
 
-**Manual verification and corrections**
+### What the agent changed
 
-I reviewed the changed files and did not accept incompatible type-syntax advice
-for this Python 3.9 project. I ran the full pytest and Ruff checks, then tested
-invalid input, a low guess, a winning guess, and New Game in the live interface.
-The New Game check confirmed that attempts, score, feedback, and Guess History
-were all cleared.
+1. It updated `logic_utils.py` with functions for parsing guesses, comparing the
+   guess, choosing a hint, setting the difficulty range, and updating the score.
+2. It updated `app.py` so New Game clears the full session state.
+3. It added a Guess History table that shows the attempt number, guess, and
+   result.
+4. It expanded `tests/test_game_logic.py` and helped finish the README and
+   reflection.
 
-## Test Generation (Advanced Edge Cases)
+### What I checked myself
 
-**Prompt used**
+I read through the changed files, ran pytest, ran Ruff, and played the game in
+the browser. I tried bad input, a low guess, the correct guess, and New Game. I
+also skipped a type syntax suggestion that did not work with Python 3.9.
 
-> Generate focused pytest cases for `parse_guess()` and the extracted game
-> logic. Include empty, non-numeric, decimal, negative, and out-of-range input,
-> plus hint direction and scoring regressions. Keep every test deterministic.
+## Test generation
 
-| Edge Case | AI-Suggested Test | Did It Pass? | Why It Matters |
-|-----------|-------------------|--------------|----------------|
-| Empty or whitespace input | Parameterize `None`, `""`, and `"   "`; expect `Enter a guess.` | Yes | Prevents blank submissions from becoming attempts |
-| Non-integer input | Parameterize `"hello"`, `"4.5"`, and `"1e2"`; expect a whole-number error | Yes | Prevents silent decimal truncation and confusing conversions |
-| Out-of-range input | Parameterize `"0"`, `"101"`, and `"-5"` for a 1-100 game | Yes | Enforces the active difficulty boundaries |
-| Wrong hint direction | Assert `Too High` contains `LOWER` and `Too Low` contains `HIGHER` | Yes | Protects the main starter bug from returning |
-| Wrong-guess scoring | Assert high and low misses leave the score unchanged | Yes | Prevents repeated misses from adding points |
+### Prompt
 
-## Linting and Style
+> Create focused pytest cases for parse_guess and the game logic. Include blank
+> input, text, decimals, negative numbers, numbers outside the range, hint
+> directions, and scoring. Keep the tests simple and repeatable.
 
-**Prompt used**
+| Edge Case | Test Idea | Passed? | Why I Included It |
+|-----------|-----------|---------|-------------------|
+| Blank input | Try `None`, an empty string, and spaces | Yes | A blank submission should not count as a guess. |
+| Text and decimals | Try `hello`, `4.5`, and `1e2` | Yes | The game asks for a whole number and should not quietly change the input. |
+| Outside the range | Try `0`, `101`, and `-5` in a 1 to 100 game | Yes | The selected difficulty range should matter. |
+| Hint direction | Check that Too High says lower and Too Low says higher | Yes | This was one of the main starter bugs. |
+| Wrong guess scoring | Check that a miss leaves the score alone | Yes | A wrong answer should not give points. |
 
-> Review the extracted Python logic for readable docstrings, PEP 8 issues, and
-> import ordering without dropping Python 3.9 compatibility.
+## Style check
 
-**First linting output**
+### Prompt
 
-```text
-I001 Import block is un-sorted or un-formatted
-Found 2 import-ordering errors.
-```
+> Check the Python files for readable docstrings, import order, and basic style
+> problems. Keep the code compatible with Python 3.9.
 
-The broader modernization pass also proposed `X | None`. I did not apply that
-suggestion because the verified runtime is Python 3.9.6. I applied only the safe
-import-order fixes and retained compatible `Optional`/`Tuple` annotations.
-
-**Final linting output**
+The first check found two import order problems. I fixed those, kept the Python
+3.9 compatible type annotations, and ran the check again.
 
 ```text
 $ ruff check --select E,F,I app.py logic_utils.py tests/test_game_logic.py
