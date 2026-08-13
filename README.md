@@ -1,54 +1,98 @@
-# 🎮 Game Glitch Investigator: The Impossible Guesser
+# 🎮 Game Glitch Investigator
 
-## 🚨 The Situation
+Game Glitch Investigator is a Streamlit number-guessing game repaired from an
+intentionally buggy AI-generated starter. The player selects a difficulty,
+enters whole-number guesses, follows higher/lower hints, and earns more points
+for solving the game in fewer valid attempts.
 
-You asked an AI to build a simple "Number Guessing Game" using Streamlit.
-It wrote the code, ran away, and now the game is unplayable. 
+## Setup and Run
 
-- You can't win.
-- The hints lie to you.
-- The secret number seems to have commitment issues.
-
-## 🛠️ Setup
-
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the broken app: `python -m streamlit run app.py`
-
-## 🕵️‍♂️ Your Mission
-
-1. **Play the game.** Open the "Developer Debug Info" tab in the app to see the secret number. Try to win.
-2. **Find the State Bug.** Why does the secret number change every time you click "Submit"? Ask ChatGPT: *"How do I keep a variable from resetting in Streamlit when I click a button?"*
-3. **Fix the Logic.** The hints ("Higher/Lower") are wrong. Fix them.
-4. **Refactor & Test.** - Move the logic into `logic_utils.py`.
-   - Run `pytest` in your terminal.
-   - Keep fixing until all tests pass!
-
-## 📝 Document Your Experience
-
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
-
-## 📸 Demo Walkthrough
-
-Describe your fixed game in numbered steps so a reader can follow along without watching a video:
-
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
-
-**Screenshot** *(optional)*: <!-- Insert a screenshot of your fixed, winning game here -->
-
-## 🧪 Test Results
-
-```
-# Paste your pytest output here, e.g.:
-# pytest tests/
-# ========================= X passed in 0.XXs =========================
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
-## 🚀 Stretch Features
+Run the automated checks with:
 
-- [ ] [If you choose to complete Challenge 4, describe the Enhanced UI changes here — a screenshot is optional]
+```bash
+pytest -q
+ruff check --select E,F,I app.py logic_utils.py tests/test_game_logic.py
+```
+
+## Bugs Found and Fixed
+
+- **Reversed hints:** a low guess displayed `Go LOWER`, while a high guess
+  displayed `Go HIGHER`. `get_hint_message()` now maps each outcome to the
+  correct direction.
+- **Mixed comparison types:** the app converted the secret to a string on
+  alternating attempts. The extracted `check_guess()` now compares integers
+  consistently.
+- **Unstable scoring:** repeated wrong guesses could alternately add and remove
+  points. `update_score()` now changes the score only after a win and rewards
+  earlier wins.
+- **Attempt-count bugs:** the game began at attempt 1 and invalid input consumed
+  attempts. It now begins at 0 and increments only after a valid, in-range
+  integer.
+- **Incomplete reset:** New Game left old history/status behind and ignored the
+  active range. `reset_game()` now clears all game state and uses the selected
+  difficulty.
+- **Untestable placeholders:** `logic_utils.py` raised `NotImplementedError`.
+  The game logic now lives in pure, documented functions with pytest coverage.
+
+## Demo Walkthrough
+
+This is the verified post-fix game session used for the final check:
+
+1. Start a Normal game. The page shows a range of 1-100, 8 attempts left, and
+   a score of 0.
+2. Enter `abc`. The game returns `Enter a whole number.` and still shows all 8
+   attempts because invalid input does not consume one.
+3. With the debug secret set to `16`, enter `10`. The game displays
+   `📈 Too low — guess HIGHER!`, records the result in Guess History, leaves the
+   score at 0, and shows 7 attempts left.
+4. Enter `16`. The game reports a win, records the second attempt, and awards a
+   final score of 90.
+5. Select New Game. The score returns to 0, the history is cleared, all 8
+   attempts are available, and a new in-range secret is generated.
+
+## Automated Test Results
+
+The suite covers comparison outcomes, correct hint directions, empty input,
+non-numeric input, decimal input, negative/out-of-range values, difficulty
+ranges, and scoring behavior.
+
+```text
+$ pytest -q
+.....................                                                    [100%]
+21 passed in 0.03s
+```
+
+Style verification:
+
+```text
+$ ruff check --select E,F,I app.py logic_utils.py tests/test_game_logic.py
+All checks passed!
+```
+
+## AI Collaboration
+
+Codex helped identify the code-level causes, extract the logic, generate tests,
+and review the full project against the rubric. I verified its changes by
+reviewing the diffs, running all 21 tests, and completing the live walkthrough
+above. The detailed helpful and rejected suggestions are recorded in
+[`reflection.md`](reflection.md), and the stretch workflow is recorded in
+[`ai_interactions.md`](ai_interactions.md).
+
+## Stretch Features Completed
+
+- **Advanced edge-case testing:** more than three specific input edge cases are
+  covered, and the passing output is included above.
+- **Agent-mode feature expansion:** Codex added a functional Guess History table
+  that records the attempt number, guess, and result.
+- **Professional documentation and style:** every function in
+  `logic_utils.py` has a docstring, and Ruff reports no E/F/I issues.
+- **Enhanced UI and formatting:** attempts and score use metrics, feedback is
+  clearly categorized, and the structured `st.table()` history makes each game
+  easy to follow.
