@@ -63,3 +63,30 @@ The first check found two import order problems. I fixed those, kept the Python
 $ ruff check --select E,F,I app.py logic_utils.py tests/test_game_logic.py
 All checks passed!
 ```
+
+## Model comparison
+
+I gave Codex and GitHub Copilot the same hint bug. GitHub Copilot was running in
+Auto mode, and the page identified the retry model as `gpt-5-mini`.
+
+### Prompt used for both
+
+> Review this Python bug as a second model for a CodePath assignment. The
+> starter code returns ("Too High", "📈 Go HIGHER!") when guess > secret and
+> ("Too Low", "📉 Go LOWER!") otherwise. Explain the cause, give the most
+> Pythonic fix, and give one focused pytest example. Keep the answer under 150
+> words.
+
+| Question | Codex | GitHub Copilot Auto (`gpt-5-mini`) |
+|----------|-------|--------------------------------------|
+| What caused the bug? | The outcome names were correct, but the player messages were mapped to the wrong direction. | The high and low messages were inverted inside the comparison branches. |
+| Suggested fix | Keep `check_guess()` focused on the outcome, then use `get_hint_message()` for the player message. | Swap the two messages inside one `feedback()` function that returns a tuple. |
+| Suggested test | Test all three outcomes and separately check that Too High contains LOWER and Too Low contains HIGHER. | Test that `feedback(10, 5)` returns Too High with the lower message. |
+
+### My comparison
+
+Copilot gave the quickest explanation. It was easy to understand because it
+went straight to the two reversed strings. Codex gave the more Pythonic fix for
+this project because it kept the comparison logic separate from the Streamlit
+message and matched the existing tests better. I preferred Codex for the final
+code, but Copilot was better for a short explanation of the original mistake.
