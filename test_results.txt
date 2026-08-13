@@ -1,0 +1,8 @@
+Automated verification completed with Python 3.9.6.
+
+$ pytest -q
+.....................                                                    [100%]
+21 passed in 0.03s
+
+$ ruff check --select E,F,I app.py logic_utils.py tests/test_game_logic.py
+All checks passed!
